@@ -27,16 +27,20 @@ def download_ftp_dir(ftp, remote_dir, local_dir):
             download_ftp_dir(ftp, remote_path, local_path)
             ftp.cwd("..")
         except ftplib.error_perm:
-            with open(local_path, "wb") as f:
-                ftp.retrbinary("RETR " + file, f.write)
+            if not os.path.exists(local_path):
+                print(f"Baixando arquivo: {file}")
+                with open(local_path, "wb") as f:
+                    ftp.retrbinary("RETR " + file, f.write)
+            else:
+                print(f"O arquivo {file} já existe localmente. Pulando o download.")
 
 def main():
     ftp = ftplib.FTP(ftp_host)
     ftp.login(ftp_user, ftp_pass)
+
     print(f"Conectado ao FTP: {ftp_host}")
 
     download_ftp_dir(ftp, remote_dir, local_dir)
-
     ftp.quit()
 
 if __name__ == "__main__":
